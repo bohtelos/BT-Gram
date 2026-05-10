@@ -24,5 +24,20 @@ public class MainWindow {
         authorLabel.setForeground(Color.GRAY);
         frame.add(authorLabel);
 
+        DefaultListModel<String> userListModel = new DefaultListModel<>();
+        userListModel.addElement("BulgarEnthusiast");
+        userListModel.addElement("Ander the British");
+        userListModel.addElement("Kastovian");
+        userListModel.addElement("Daniel Ivanescu");
+        userListModel.addElement("Lennick Arthur");
+        userListModel.addElement("Gorrick Mike");
+
+        JList<String> userList = new JList<>(userListModel);
+        userList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+        JScrollPane scrollPanel = new JScrollPane(userList);
+        scrollPanel.setBounds(50, 100, 750, 300);
+        frame.add(scrollPanel);
+
     }
 }
