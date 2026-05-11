@@ -10,6 +10,17 @@ public class MainWindow {
         frame.setLocationRelativeTo(null);
         frame.setResizable(true);
 
+        DefaultListModel<String> userListModel = new DefaultListModel<>();
+        userListModel.addElement("BulgarEnthusiast");
+        userListModel.addElement("Ander the British");
+        userListModel.addElement("Kastovian");
+        userListModel.addElement("Daniel Ivanescu");
+        userListModel.addElement("Lennick Arthur");
+        userListModel.addElement("Gorrick Mike");
+
+        JList<String> userList = new JList<>(userListModel);
+        userList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
         JLabel titleLabel = new JLabel("BT-Gram by bohtelos");
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
@@ -24,22 +35,33 @@ public class MainWindow {
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
 
-        DefaultListModel<String> userListModel = new DefaultListModel<>();
-        userListModel.addElement("BulgarEnthusiast");
-        userListModel.addElement("Ander the British");
-        userListModel.addElement("Kastovian");
-        userListModel.addElement("Daniel Ivanescu");
-        userListModel.addElement("Lennick Arthur");
-        userListModel.addElement("Gorrick Mike");
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new FlowLayout());
 
-        JList<String> userList = new JList<>(userListModel);
-        userList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        JTextField nameField = new JTextField(15);
+
+        JButton addButton = new JButton("Add");
+
+        addButton.addActionListener(e -> {
+            String text = nameField.getText().trim();
+            if (!text.isEmpty()) {
+                userListModel.addElement(text);
+                nameField.addActionListener(enter -> addButton.doClick());
+                nameField.setText("");
+
+            }
+        });
+
+        inputPanel.add(new JLabel("Name:"));
+        inputPanel.add(nameField);
+        inputPanel.add(addButton);
 
         JScrollPane scrollPanel = new JScrollPane(userList);
         frame.add(scrollPanel, BorderLayout.CENTER);
         frame.add(headerPanel, BorderLayout.NORTH);
         headerPanel.add(titleLabel);
         headerPanel.add(authorLabel);
+        frame.add(inputPanel, BorderLayout.SOUTH);
         frame.setVisible(true);
 
     }
