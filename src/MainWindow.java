@@ -42,8 +42,9 @@ public class MainWindow {
 
         JButton addButton = new JButton("Add");
         JButton deleteButton = new JButton("Delete");
+        JButton editButton = new JButton("Edit");
 
-        addButton.addActionListener(e -> {
+        addButton.addActionListener(pressAdd -> {
             String text = nameField.getText().trim();
             if (!text.isEmpty()) {
                 userListModel.addElement(text);
@@ -60,10 +61,23 @@ public class MainWindow {
             }
         });
 
+        editButton.addActionListener(pressEdit -> {
+            int selectedIndex = userList.getSelectedIndex();
+            String currentName = userListModel.getElementAt(selectedIndex);
+            String newName = JOptionPane.showInputDialog(frame, "Change name:", currentName);
+
+            if (selectedIndex != -1) {
+
+                if (newName != null && !newName.trim().isEmpty()) {
+                    userListModel.setElementAt(newName, selectedIndex);
+                }
+            }});
+
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
         inputPanel.add(addButton);
         inputPanel.add(deleteButton);
+        inputPanel.add(editButton);
 
         JScrollPane scrollPanel = new JScrollPane(userList);
         frame.add(scrollPanel, BorderLayout.CENTER);
