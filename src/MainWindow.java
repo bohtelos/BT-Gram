@@ -41,6 +41,7 @@ public class MainWindow {
         JTextField nameField = new JTextField(15);
 
         JButton addButton = new JButton("Add");
+        JButton deleteButton = new JButton("Delete");
 
         addButton.addActionListener(e -> {
             String text = nameField.getText().trim();
@@ -52,9 +53,17 @@ public class MainWindow {
             }
         });
 
+        deleteButton.addActionListener(pressDelete -> {
+            int selectedIndex = userList.getSelectedIndex();
+            if (selectedIndex != -1) {
+                userListModel.remove(selectedIndex);
+            }
+        });
+
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
         inputPanel.add(addButton);
+        inputPanel.add(deleteButton);
 
         JScrollPane scrollPanel = new JScrollPane(userList);
         frame.add(scrollPanel, BorderLayout.CENTER);
