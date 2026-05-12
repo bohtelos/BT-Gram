@@ -44,11 +44,12 @@ public class MainWindow {
         JButton deleteButton = new JButton("Delete");
         JButton editButton = new JButton("Edit");
 
+        nameField.addActionListener(enter -> addButton.doClick());
+
         addButton.addActionListener(pressAdd -> {
             String text = nameField.getText().trim();
             if (!text.isEmpty()) {
                 userListModel.addElement(text);
-                nameField.addActionListener(enter -> addButton.doClick());
                 nameField.setText("");
 
             }
