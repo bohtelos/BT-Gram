@@ -58,8 +58,20 @@ public class MainWindow {
         deleteButton.addActionListener(pressDelete -> {
             int selectedIndex = userList.getSelectedIndex();
             if (selectedIndex != -1) {
-                userListModel.remove(selectedIndex);
-            }
+
+                String selectedUser = userListModel.getElementAt(selectedIndex);
+
+                int response = JOptionPane.showConfirmDialog(frame,
+                        "Are you sure you want do delete " + selectedUser + "?",
+                        "Confirmation of deletion", JOptionPane.YES_NO_OPTION);
+
+                if (response == JOptionPane.YES_OPTION) {
+
+                    userListModel.remove(selectedIndex);
+
+                }
+
+                }
         });
 
         editButton.addActionListener(pressEdit -> {
