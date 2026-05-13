@@ -1,5 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileWriter;
+import java.io.IOException.*;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 public class MainWindow {
     public static void main(String[] args) {
@@ -51,6 +55,18 @@ public class MainWindow {
             if (!text.isEmpty()) {
                 userListModel.addElement(text);
                 nameField.setText("");
+
+                try (java.io.PrintWriter writer = new java.io.PrintWriter("Contacts.txt")) {
+
+                    for (int i = 0; i < userListModel.getSize(); i++) {
+                        String name = userListModel.getElementAt(i);
+                        writer.println(name);
+                    }
+
+                }
+                catch (java.io.FileNotFoundException error) {
+                    error.printStackTrace();
+                }
 
             }
         });
