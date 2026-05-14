@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException.*;
 import java.io.PrintWriter;
@@ -56,17 +57,7 @@ public class MainWindow {
                 userListModel.addElement(text);
                 nameField.setText("");
 
-                try (java.io.PrintWriter writer = new java.io.PrintWriter("Contacts.txt")) {
-
-                    for (int i = 0; i < userListModel.getSize(); i++) {
-                        String name = userListModel.getElementAt(i);
-                        writer.println(name);
-                    }
-
-                }
-                catch (java.io.FileNotFoundException error) {
-                    error.printStackTrace();
-                }
+                saveToFile(userListModel);
 
             }
         });
@@ -85,6 +76,8 @@ public class MainWindow {
 
                     userListModel.remove(selectedIndex);
 
+                    saveToFile(userListModel);
+
                 }
 
                 }
@@ -92,14 +85,14 @@ public class MainWindow {
 
         editButton.addActionListener(pressEdit -> {
             int selectedIndex = userList.getSelectedIndex();
-            String currentName = userListModel.getElementAt(selectedIndex);
-            String newName = JOptionPane.showInputDialog(frame, "Change name:", currentName);
-
             if (selectedIndex != -1) {
+                String currentName = userListModel.getElementAt(selectedIndex);
+                String newName = JOptionPane.showInputDialog(frame, "Change name:", currentName);
 
                 if (newName != null && !newName.trim().isEmpty()) {
                     userListModel.setElementAt(newName, selectedIndex);
                 }
+                saveToFile(userListModel);
             }});
 
         inputPanel.add(new JLabel("Name:"));
@@ -117,4 +110,17 @@ public class MainWindow {
         frame.setVisible(true);
 
     }
+
+    private static void saveToFile(DefaultListModel<String>model) {
+        try (PrintWriter writer = new PrintWriter("Contacts.txt")) {
+            for (int i = 0; i < model.getSize(); i++) {
+
+                writer.println(model.getElementAt(i));
+
+            }
+        } catch (FileNotFoundException error) {
+            System.err.println("Error: " + error.getMessage());
+        }
+    }
+
 }
