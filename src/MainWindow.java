@@ -1,13 +1,15 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.*;
 import java.io.IOException.*;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public class MainWindow {
     public static void main(String[] args) {
+        File contactsFile = new File("Contacts.txt");
         JFrame frame = new JFrame("BT-Gram");
         frame.setLayout(new BorderLayout(10, 10));
         frame.setSize(850, 500);
@@ -16,17 +18,37 @@ public class MainWindow {
         frame.setResizable(true);
 
         DefaultListModel<String> userListModel = new DefaultListModel<>();
-        userListModel.addElement("BulgarEnthusiast");
-        userListModel.addElement("Ander the British");
-        userListModel.addElement("Kastovian");
-        userListModel.addElement("Daniel Ivanescu");
-        userListModel.addElement("Lennick Arthur");
-        userListModel.addElement("Gorrick Mike");
+
+        if (contactsFile.exists() && contactsFile.canRead()) {
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(contactsFile, StandardCharsets.UTF_8))) {
+
+                String line;
+                while ((line = reader.readLine()) != null ) {
+                    String trimmed = line.trim();
+                    if (!trimmed.isEmpty()) {
+                        userListModel.addElement(trimmed);
+                    }
+                }
+
+            }
+            catch (IOException ex) {
+                JOptionPane.showMessageDialog(null,
+                        "Error while reading the file:\n" + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
 
         JList<String> userList = new JList<>(userListModel);
         userList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         JLabel titleLabel = new JLabel("BT-Gram by bohtelos");
+        JLabel noContactsLabel = new JLabel("No contacts yet. Add your first one!");
+        noContactsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        noContactsLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        noContactsLabel.setForeground(Color.GRAY);
+        noContactsLabel.setVisible(userListModel.isEmpty());
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -55,6 +77,7 @@ public class MainWindow {
             String text = nameField.getText().trim();
             if (!text.isEmpty()) {
                 userListModel.addElement(text);
+                noContactsLabel.setVisible(false);
                 nameField.setText("");
 
                 saveToFile(userListModel);
@@ -80,6 +103,10 @@ public class MainWindow {
 
                 }
 
+                if (userListModel.isEmpty()) {
+                    noContactsLabel.setVisible(true);
+                }
+
                 }
         });
 
@@ -102,13 +129,18 @@ public class MainWindow {
         inputPanel.add(editButton);
 
         JScrollPane scrollPanel = new JScrollPane(userList);
-        frame.add(scrollPanel, BorderLayout.CENTER);
-        frame.add(headerPanel, BorderLayout.NORTH);
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(scrollPanel, BorderLayout.CENTER);
+        centerPanel.add(noContactsLabel, BorderLayout.NORTH);
+
         headerPanel.add(titleLabel);
         headerPanel.add(authorLabel);
-        frame.add(inputPanel, BorderLayout.SOUTH);
-        frame.setVisible(true);
 
+        frame.add(headerPanel, BorderLayout.NORTH);
+        frame.add(centerPanel, BorderLayout.CENTER);
+        frame.add(inputPanel, BorderLayout.SOUTH);
+
+        frame.setVisible(true);
     }
 
     private static void saveToFile(DefaultListModel<String>model) {
