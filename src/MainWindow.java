@@ -91,6 +91,7 @@ public class MainWindow {
             }
 
             countLabel.setText("Found: " + userListModel.size());
+            searchField.setText("");
 
             noContactsLabel.setVisible(userListModel.isEmpty());
 
@@ -99,6 +100,7 @@ public class MainWindow {
         JButton addButton = new JButton("Add");
         JButton deleteButton = new JButton("Delete");
         JButton editButton = new JButton("Edit");
+        JButton refreshButton = new JButton("Refresh");
 
         nameField.addActionListener(enter -> addButton.doClick());
 
@@ -163,11 +165,26 @@ public class MainWindow {
                 saveToFile(allContactsArchive);
             }});
 
+        refreshButton.addActionListener(refresh -> {
+            searchField.setText("");
+            userListModel.clear();
+
+            for (String contact : allContactsArchive) {
+                userListModel.addElement(contact);
+            }
+
+            countLabel.setText("Contacts: " + allContactsArchive.size());
+
+            noContactsLabel.setVisible(userListModel.isEmpty());
+
+        });
+
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
         inputPanel.add(addButton);
         inputPanel.add(deleteButton);
         inputPanel.add(editButton);
+        inputPanel.add(refreshButton);
 
         JScrollPane scrollPanel = new JScrollPane(userList);
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -184,6 +201,7 @@ public class MainWindow {
         frame.add(inputPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
+
     }
 
     private static void saveToFile(ArrayList<String>list) {
