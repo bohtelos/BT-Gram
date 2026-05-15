@@ -63,6 +63,10 @@ public class MainWindow {
         noContactsLabel.setForeground(Color.GRAY);
         noContactsLabel.setVisible(userListModel.isEmpty());
 
+        JLabel countLabel = new JLabel("Contacts: " + allContactsArchive.size());
+        countLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        countLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         JTextField nameField = new JTextField(15);
         JTextField searchField = new JTextField(15);
 
@@ -86,6 +90,8 @@ public class MainWindow {
                 }
             }
 
+            countLabel.setText("Found: " + userListModel.size());
+
             noContactsLabel.setVisible(userListModel.isEmpty());
 
         });
@@ -103,6 +109,8 @@ public class MainWindow {
                 noContactsLabel.setVisible(false);
                 nameField.setText("");
                 allContactsArchive.add(text);
+
+                countLabel.setText("Contacts: " + allContactsArchive.size());
 
                 saveToFile(allContactsArchive);
 
@@ -123,6 +131,8 @@ public class MainWindow {
 
                     userListModel.remove(selectedIndex);
                     allContactsArchive.remove(selectedUser);
+
+                    countLabel.setText("Contacts: " + allContactsArchive.size());
 
                     saveToFile(allContactsArchive);
 
@@ -166,6 +176,7 @@ public class MainWindow {
 
         headerPanel.add(titleLabel);
         headerPanel.add(authorLabel);
+        headerPanel.add(countLabel);
         headerPanel.add(searchPanel);
 
         frame.add(headerPanel, BorderLayout.NORTH);
