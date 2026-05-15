@@ -6,6 +6,7 @@ import java.io.IOException.*;
 import java.nio.charset.StandardCharsets;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 
 public class MainWindow {
     public static void main(String[] args) {
@@ -18,6 +19,7 @@ public class MainWindow {
         frame.setResizable(true);
 
         DefaultListModel<String> userListModel = new DefaultListModel<>();
+        ArrayList<String> allContactsArchive = new ArrayList<>();
 
         if (contactsFile.exists() && contactsFile.canRead()) {
 
@@ -28,6 +30,7 @@ public class MainWindow {
                     String trimmed = line.trim();
                     if (!trimmed.isEmpty()) {
                         userListModel.addElement(trimmed);
+                        allContactsArchive.add(trimmed);
                     }
                 }
 
@@ -44,11 +47,6 @@ public class MainWindow {
         userList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         JLabel titleLabel = new JLabel("BT-Gram by bohtelos");
-        JLabel noContactsLabel = new JLabel("No contacts yet. Add your first one!");
-        noContactsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        noContactsLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
-        noContactsLabel.setForeground(Color.GRAY);
-        noContactsLabel.setVisible(userListModel.isEmpty());
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -59,13 +57,38 @@ public class MainWindow {
         authorLabel.setForeground(Color.GRAY);
         authorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        JLabel noContactsLabel = new JLabel("No contacts yet. Add your first one!");
+        noContactsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        noContactsLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        noContactsLabel.setForeground(Color.GRAY);
+        noContactsLabel.setVisible(userListModel.isEmpty());
+
+        JTextField nameField = new JTextField(15);
+        JTextField searchField = new JTextField(15);
+
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+
+        JPanel searchPanel = new JPanel();
+        searchPanel.add(new JLabel("Search:"));
+        searchPanel.add(searchField);
 
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout());
 
-        JTextField nameField = new JTextField(15);
+        searchField.addActionListener(array -> {
+            String query = searchField.getText().toLowerCase().trim();
+            userListModel.clear();
+
+            for (String contact : allContactsArchive) {
+                if (contact.toLowerCase().contains(query)) {
+                    userListModel.addElement(contact);
+                }
+            }
+
+            noContactsLabel.setVisible(userListModel.isEmpty());
+
+        });
 
         JButton addButton = new JButton("Add");
         JButton deleteButton = new JButton("Delete");
@@ -79,8 +102,9 @@ public class MainWindow {
                 userListModel.addElement(text);
                 noContactsLabel.setVisible(false);
                 nameField.setText("");
+                allContactsArchive.add(text);
 
-                saveToFile(userListModel);
+                saveToFile(allContactsArchive);
 
             }
         });
@@ -98,8 +122,9 @@ public class MainWindow {
                 if (response == JOptionPane.YES_OPTION) {
 
                     userListModel.remove(selectedIndex);
+                    allContactsArchive.remove(selectedUser);
 
-                    saveToFile(userListModel);
+                    saveToFile(allContactsArchive);
 
                 }
 
@@ -119,7 +144,13 @@ public class MainWindow {
                 if (newName != null && !newName.trim().isEmpty()) {
                     userListModel.setElementAt(newName, selectedIndex);
                 }
-                saveToFile(userListModel);
+
+                int archiveIndex = allContactsArchive.indexOf(currentName);
+                if (archiveIndex != -1) {
+                    allContactsArchive.set(archiveIndex, newName);
+                }
+
+                saveToFile(allContactsArchive);
             }});
 
         inputPanel.add(new JLabel("Name:"));
@@ -135,6 +166,7 @@ public class MainWindow {
 
         headerPanel.add(titleLabel);
         headerPanel.add(authorLabel);
+        headerPanel.add(searchPanel);
 
         frame.add(headerPanel, BorderLayout.NORTH);
         frame.add(centerPanel, BorderLayout.CENTER);
@@ -143,11 +175,11 @@ public class MainWindow {
         frame.setVisible(true);
     }
 
-    private static void saveToFile(DefaultListModel<String>model) {
+    private static void saveToFile(ArrayList<String>list) {
         try (PrintWriter writer = new PrintWriter("Contacts.txt")) {
-            for (int i = 0; i < model.getSize(); i++) {
+            for (int i = 0; i < list.size(); i++) {
 
-                writer.println(model.getElementAt(i));
+                writer.println(list.get(i));
 
             }
         } catch (FileNotFoundException error) {
