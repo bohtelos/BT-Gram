@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class MainWindow {
     public static void main(String[] args) {
@@ -80,6 +82,32 @@ public class MainWindow {
 
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout());
+
+        userList.addListSelectionListener(list -> {
+            int selectedIndex = userList.getSelectedIndex();
+            if (selectedIndex != -1 && !list.getValueIsAdjusting()) {
+
+                String selectedUser = userListModel.getElementAt(selectedIndex);
+
+                // Not important for others; Checking under hood what happens to the app.
+
+                System.out.println("Clicked on: " + selectedUser);
+
+                JDialog contactsCard = new JDialog((JFrame)null, "Contacts Info", true);
+
+                contactsCard.setSize(300, 200);
+
+                contactsCard.setLocationRelativeTo(null);
+
+                JLabel nameLabel = new JLabel("Name: " + selectedUser);
+                nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+                contactsCard.add(nameLabel);
+
+                contactsCard.setVisible(true);
+
+            }
+        });
 
         searchField.addActionListener(array -> {
             String query = searchField.getText().toLowerCase().trim();
