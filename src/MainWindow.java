@@ -2,11 +2,12 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.io.*;
-import java.io.IOException.*;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainWindow {
     public static void main(String[] args) {
@@ -101,6 +102,7 @@ public class MainWindow {
         JButton deleteButton = new JButton("Delete");
         JButton editButton = new JButton("Edit");
         JButton refreshButton = new JButton("Refresh");
+        JButton sortButton = new JButton("A-Z");
 
         nameField.addActionListener(enter -> addButton.doClick());
 
@@ -179,12 +181,29 @@ public class MainWindow {
 
         });
 
+        sortButton.addActionListener(sort -> {
+            Collections.sort(allContactsArchive);
+
+            userListModel.clear();
+
+            for (String contact : allContactsArchive) {
+                userListModel.addElement(contact);
+
+                countLabel.setText("Contacts: " + allContactsArchive.size());
+
+                saveToFile(allContactsArchive);
+
+            }
+
+        });
+
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
         inputPanel.add(addButton);
         inputPanel.add(deleteButton);
         inputPanel.add(editButton);
         inputPanel.add(refreshButton);
+        inputPanel.add(sortButton);
 
         JScrollPane scrollPanel = new JScrollPane(userList);
         JPanel centerPanel = new JPanel(new BorderLayout());
