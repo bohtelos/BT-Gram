@@ -16,7 +16,7 @@ public class MainWindow {
         File contactsFile = new File("Contacts.txt");
         JFrame frame = new JFrame("BT-Gram");
         frame.setLayout(new BorderLayout(10, 10));
-        frame.setSize(850, 500);
+        frame.setSize(1050, 600);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setResizable(true);
@@ -32,7 +32,10 @@ public class MainWindow {
                 while ((line = reader.readLine()) != null ) {
                     String trimmed = line.trim();
                     if (!trimmed.isEmpty()) {
-                        userListModel.addElement(trimmed);
+
+                        String[] parts = trimmed.split("\\|");
+                        userListModel.addElement(parts[0]);
+
                         allContactsArchive.add(trimmed);
                     }
                 }
@@ -72,6 +75,8 @@ public class MainWindow {
 
         JTextField nameField = new JTextField(15);
         JTextField searchField = new JTextField(15);
+        JTextField countryField = new JTextField(15);
+        JTextField infoField = new JTextField(15);
 
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
@@ -87,22 +92,30 @@ public class MainWindow {
             int selectedIndex = userList.getSelectedIndex();
             if (selectedIndex != -1 && !list.getValueIsAdjusting()) {
 
-                String selectedUser = userListModel.getElementAt(selectedIndex);
+                String fullData = allContactsArchive.get(selectedIndex);
+
+                String[] parts = fullData.split("\\|");
+                String name = parts[0];
+                String country = (parts.length > 1) ? parts[1] : "Unknown";
+                String info = (parts.length >2) ? parts[2] : "No notes";
 
                 // Not important for others; Checking under hood what happens to the app.
 
-                System.out.println("Clicked on: " + selectedUser);
+                System.out.println("Clicked on: " + name);
 
                 JDialog contactsCard = new JDialog((JFrame)null, "Contacts Info", true);
 
                 contactsCard.setSize(300, 200);
-
+                contactsCard.setLayout(new GridLayout(3, 1, 10, 10));
                 contactsCard.setLocationRelativeTo(null);
 
-                JLabel nameLabel = new JLabel("Name: " + selectedUser);
-                nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                JLabel nameLabel = new JLabel("Name: " + name, SwingConstants.CENTER);
+                JLabel countryLabel = new JLabel("Country: " + country, SwingConstants.CENTER);
+                JLabel infoLabel = new JLabel("Notes: " + info, SwingConstants.CENTER);
 
                 contactsCard.add(nameLabel);
+                contactsCard.add(countryLabel);
+                contactsCard.add(infoLabel);
 
                 contactsCard.setVisible(true);
 
@@ -114,8 +127,11 @@ public class MainWindow {
             userListModel.clear();
 
             for (String contact : allContactsArchive) {
+
+                String parts[] = contact.split("\\|");
+
                 if (contact.toLowerCase().contains(query)) {
-                    userListModel.addElement(contact);
+                    userListModel.addElement(parts[0]);
                 }
             }
 
@@ -133,14 +149,28 @@ public class MainWindow {
         JButton sortButton = new JButton("A-Z");
 
         nameField.addActionListener(enter -> addButton.doClick());
+        countryField.addActionListener(enterCountry -> addButton.doClick());
+        infoField.addActionListener(enterInfo -> addButton.doClick());
 
         addButton.addActionListener(pressAdd -> {
-            String text = nameField.getText().trim();
-            if (!text.isEmpty()) {
-                userListModel.addElement(text);
+
+            String nameText = nameField.getText().trim();
+            String countryText = countryField.getText().trim();
+            String infoText = infoField.getText().trim();
+            if (!nameText.isEmpty()) {
+
+                if (countryText.isEmpty()) countryText = "Unknown";
+                if (infoText.isEmpty()) infoText = "No notes";
+
+                String fullContactLine = nameText + "|" + countryText + "|" + infoText;
+
+                userListModel.addElement(nameText);
                 noContactsLabel.setVisible(false);
+                allContactsArchive.add(fullContactLine);
+
                 nameField.setText("");
-                allContactsArchive.add(text);
+                countryField.setText("");
+                infoField.setText("");
 
                 countLabel.setText("Contacts: " + allContactsArchive.size());
 
@@ -162,7 +192,7 @@ public class MainWindow {
                 if (response == JOptionPane.YES_OPTION) {
 
                     userListModel.remove(selectedIndex);
-                    allContactsArchive.remove(selectedUser);
+                    allContactsArchive.remove(selectedIndex);
 
                     countLabel.setText("Contacts: " + allContactsArchive.size());
 
@@ -180,27 +210,36 @@ public class MainWindow {
         editButton.addActionListener(pressEdit -> {
             int selectedIndex = userList.getSelectedIndex();
             if (selectedIndex != -1) {
-                String currentName = userListModel.getElementAt(selectedIndex);
+                String fullData = allContactsArchive.get(selectedIndex);
+                String[] parts = fullData.split("\\|");
+                String currentName = parts[0];
+                String currentCountry = (parts.length > 1) ? parts[1] : "Unknown";
+                String currentInfo = (parts.length > 2) ? parts[2] : "No notes";
+
                 String newName = JOptionPane.showInputDialog(frame, "Change name:", currentName);
 
                 if (newName != null && !newName.trim().isEmpty()) {
                     userListModel.setElementAt(newName, selectedIndex);
-                }
 
-                int archiveIndex = allContactsArchive.indexOf(currentName);
-                if (archiveIndex != -1) {
-                    allContactsArchive.set(archiveIndex, newName);
-                }
 
-                saveToFile(allContactsArchive);
-            }});
+                    String updatedContactLine = newName + "|" + currentCountry + "|" + currentInfo;
+
+                    allContactsArchive.set(selectedIndex, updatedContactLine);
+
+                    saveToFile(allContactsArchive);
+                }
+            }
+            });
 
         refreshButton.addActionListener(refresh -> {
             searchField.setText("");
             userListModel.clear();
 
             for (String contact : allContactsArchive) {
-                userListModel.addElement(contact);
+
+                String[] parts = contact.split("\\|");
+
+                userListModel.addElement(parts[0]);
             }
 
             countLabel.setText("Contacts: " + allContactsArchive.size());
@@ -210,12 +249,16 @@ public class MainWindow {
         });
 
         sortButton.addActionListener(sort -> {
+
             Collections.sort(allContactsArchive);
 
             userListModel.clear();
 
             for (String contact : allContactsArchive) {
-                userListModel.addElement(contact);
+
+                String[] parts = contact.split("\\|");
+
+                userListModel.addElement(parts[0]);
 
                 countLabel.setText("Contacts: " + allContactsArchive.size());
 
@@ -227,6 +270,10 @@ public class MainWindow {
 
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
+        inputPanel.add(new JLabel("Country: "));
+        inputPanel.add(countryField);
+        inputPanel.add(new JLabel("Notes:"));
+        inputPanel.add(infoField);
         inputPanel.add(addButton);
         inputPanel.add(deleteButton);
         inputPanel.add(editButton);
