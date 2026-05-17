@@ -217,17 +217,31 @@ public class MainWindow {
                 String currentInfo = (parts.length > 2) ? parts[2] : "No notes";
 
                 String newName = JOptionPane.showInputDialog(frame, "Change name:", currentName);
+                if (newName == null || newName.trim().isEmpty()) {
+                    newName = currentName;
+                }
 
-                if (newName != null && !newName.trim().isEmpty()) {
                     userListModel.setElementAt(newName, selectedIndex);
 
+                    String newCountry = JOptionPane.showInputDialog(frame, "Change country:", currentCountry);
+                    if (newCountry == null || newCountry.trim().isEmpty()) {
+                        newCountry = currentCountry;
 
-                    String updatedContactLine = newName + "|" + currentCountry + "|" + currentInfo;
+                        }
+
+                    String newInfo = JOptionPane.showInputDialog(frame, "Change notes:", currentInfo);
+                    if (newInfo == null || newInfo.trim().isEmpty()) {
+                        newInfo = currentInfo;
+
+                    }
+
+                    String updatedContactLine = newName + "|" + newCountry + "|" + newInfo;
+                    System.out.println("Changed element to:" + updatedContactLine);
 
                     allContactsArchive.set(selectedIndex, updatedContactLine);
 
                     saveToFile(allContactsArchive);
-                }
+
             }
             });
 
