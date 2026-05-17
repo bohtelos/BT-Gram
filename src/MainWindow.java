@@ -92,7 +92,18 @@ public class MainWindow {
             int selectedIndex = userList.getSelectedIndex();
             if (selectedIndex != -1 && !list.getValueIsAdjusting()) {
 
-                String fullData = allContactsArchive.get(selectedIndex);
+                String selectedName = userListModel.getElementAt(selectedIndex);
+                String fullData = null;
+
+                for (String contact : allContactsArchive) {
+                    String[] parts = contact.split("\\|");
+                    if (parts.length > 0 && parts[0].equals(selectedName)) {
+                        fullData = contact;
+                        break;
+                    }
+                }
+
+                if (fullData == null) return;
 
                 String[] parts = fullData.split("\\|");
                 String name = parts[0];
@@ -192,7 +203,13 @@ public class MainWindow {
                 if (response == JOptionPane.YES_OPTION) {
 
                     userListModel.remove(selectedIndex);
-                    allContactsArchive.remove(selectedIndex);
+
+                    for (int i = 0; i < allContactsArchive.size(); i++) {
+                        if (allContactsArchive.get(i).startsWith(selectedUser + "|")) {
+                            allContactsArchive.remove(i);
+                            break;
+                        }
+                    }
 
                     countLabel.setText("Contacts: " + allContactsArchive.size());
 
@@ -210,7 +227,20 @@ public class MainWindow {
         editButton.addActionListener(pressEdit -> {
             int selectedIndex = userList.getSelectedIndex();
             if (selectedIndex != -1) {
-                String fullData = allContactsArchive.get(selectedIndex);
+
+                String selectedUser = userListModel.getElementAt(selectedIndex);
+
+                int archiveIndex = -1;
+                for (int i = 0; i < allContactsArchive.size(); i++) {
+                    if (allContactsArchive.get(i).startsWith(selectedUser + "|")) {
+                        archiveIndex = i;
+                        break;
+                    }
+                }
+
+                if (archiveIndex == -1) return;
+
+                String fullData = allContactsArchive.get(archiveIndex);
                 String[] parts = fullData.split("\\|");
                 String currentName = parts[0];
                 String currentCountry = (parts.length > 1) ? parts[1] : "Unknown";
@@ -238,7 +268,7 @@ public class MainWindow {
                     String updatedContactLine = newName + "|" + newCountry + "|" + newInfo;
                     System.out.println("Changed element to:" + updatedContactLine);
 
-                    allContactsArchive.set(selectedIndex, updatedContactLine);
+                    allContactsArchive.set(archiveIndex, updatedContactLine);
 
                     saveToFile(allContactsArchive);
 
@@ -264,7 +294,7 @@ public class MainWindow {
 
         sortButton.addActionListener(sort -> {
 
-            Collections.sort(allContactsArchive);
+            allContactsArchive.sort(String.CASE_INSENSITIVE_ORDER);
 
             userListModel.clear();
 
