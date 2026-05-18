@@ -13,7 +13,24 @@ import javax.swing.event.ListSelectionListener;
 
 public class MainWindow {
     public static void main(String[] args) {
+        System.out.println("Working directory: " + System.getProperty("user.dir"));
         File contactsFile = new File("Contacts.txt");
+
+        try {
+            if (!contactsFile.exists()) {
+                contactsFile.createNewFile();
+                System.out.println("Contacts file not found; Automatically creating a Contacts file.");
+            }
+            else {
+                System.out.println("The Contacts file exists already.");
+            }
+        }
+
+        catch (IOException error) {
+            System.out.println("Error creating Contacts file.");
+            error.printStackTrace();
+        }
+
         JFrame frame = new JFrame("BT-Gram");
         frame.setLayout(new BorderLayout(10, 10));
         frame.setSize(1050, 600);
@@ -303,12 +320,10 @@ public class MainWindow {
                 String[] parts = contact.split("\\|");
 
                 userListModel.addElement(parts[0]);
-
-                countLabel.setText("Contacts: " + allContactsArchive.size());
-
-                saveToFile(allContactsArchive);
-
             }
+
+            countLabel.setText("Contacts: " + allContactsArchive.size());
+            saveToFile(allContactsArchive);
 
         });
 
