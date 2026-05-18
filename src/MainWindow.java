@@ -131,19 +131,24 @@ public class MainWindow {
 
                 System.out.println("Clicked on: " + name);
 
-                JDialog contactsCard = new JDialog((JFrame)null, "Contacts Info", true);
-
-                contactsCard.setSize(300, 200);
-                contactsCard.setLayout(new GridLayout(3, 1, 10, 10));
-                contactsCard.setLocationRelativeTo(null);
-
                 JLabel nameLabel = new JLabel("Name: " + name, SwingConstants.CENTER);
                 JLabel countryLabel = new JLabel("Country: " + country, SwingConstants.CENTER);
                 JLabel infoLabel = new JLabel("Notes: " + info, SwingConstants.CENTER);
 
-                contactsCard.add(nameLabel);
-                contactsCard.add(countryLabel);
-                contactsCard.add(infoLabel);
+                JDialog contactsCard = new JDialog((JFrame)null, "Contacts Info", true);
+
+                JPanel cardPanel = new JPanel();
+
+                cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
+                cardPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+                cardPanel.add(nameLabel);
+                cardPanel.add(countryLabel);
+                cardPanel.add(infoLabel);
+
+                contactsCard.setLocationRelativeTo(null);
+                contactsCard.add(cardPanel);
+                contactsCard.pack();
 
                 contactsCard.setVisible(true);
 
