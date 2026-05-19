@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.KeyStroke;
 
 public class MainWindow {
     public static void main(String[] args) {
@@ -127,6 +129,9 @@ public class MainWindow {
                 String country = (parts.length > 1) ? parts[1] : "Unknown";
                 String info = (parts.length >2) ? parts[2] : "No notes";
 
+
+                JButton closeButton = new JButton("Close");
+
                 // Not important for others; Checking under hood what happens to the app.
 
                 System.out.println("Clicked on: " + name);
@@ -142,13 +147,24 @@ public class MainWindow {
                 cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
                 cardPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
+                closeButton.addActionListener(close -> {
+                    contactsCard.dispose();
+                });
+
                 cardPanel.add(nameLabel);
                 cardPanel.add(countryLabel);
                 cardPanel.add(infoLabel);
+                cardPanel.add(closeButton);
 
-                contactsCard.setLocationRelativeTo(null);
+                contactsCard.getRootPane().registerKeyboardAction(
+                        escapePress -> contactsCard.dispose(),
+                        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                        JComponent.WHEN_IN_FOCUSED_WINDOW
+                );
+
                 contactsCard.add(cardPanel);
                 contactsCard.pack();
+                contactsCard.setLocationRelativeTo(null);
 
                 contactsCard.setVisible(true);
 
